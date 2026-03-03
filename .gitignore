@@ -1,0 +1,17 @@
+# Environnement Conda
+env/
+.conda/
+*.conda
+
+# Fichier variables d’environnement
+.env
+
+# Cache Python
+__pycache__/
+*.pyc
+
+# VS Code
+.vscode/
+
+# Jupyter
+.ipynb_checkpoints/
