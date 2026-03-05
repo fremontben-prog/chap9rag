@@ -54,6 +54,7 @@ def build_metadata(row):
     }
     return metadata
 
+# Gestion des documents et chunks
 def build_documents(df):
     documents = []
     text_splitter = create_text_splitter()
