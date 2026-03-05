@@ -38,7 +38,7 @@ def create_text_splitter():
     )
     return text_splitter
     
-    
+# Gestion des metadata    
 def build_metadata(row):
     metadata = {
         "title": row.get("title_fr", ""),
