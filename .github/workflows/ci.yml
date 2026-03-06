@@ -25,12 +25,12 @@ jobs:
         uses: conda-incubator/setup-miniconda@v2
         with:
           activate-environment: chap9rag
-          environment-file: environment.yml
+          environment-file: environnement.yml
           python-version: "3.10"
           auto-activate-base: false
 
       - name: Démarrage de l'API
-        shell: bash -el {0}  # 👈 obligatoire pour activer conda
+        shell: bash -el {0}  # obligatoire pour activer conda
         env:
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
         run: |
