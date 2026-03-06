@@ -37,8 +37,11 @@ def chat(request: QuestionRequest):
 
 @app.post("/rebuild")
 def rebuild():
-    vector = build()
-    if  vector.index.ntotal == 0 :
-        return "Pas de vecteur"
-    else :
-        return "✅ Rebuid OK"
+    try:
+       vector = build()
+       if vector.index.ntotal == 0:
+            return {"status": "warning", "message": "Pas de vecteur"}
+       else:
+            return {"status": "ok", "message": "Rebuild OK"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur lors du rebuild : {str(e)}")
