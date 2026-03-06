@@ -63,17 +63,17 @@ def ask_chatbot(question, start_date=None, end_date=None):
     context = "\n".join([doc.page_content for doc in docs])
 
     prompt = f"""
-Tu es un assistant qui recommande des événements.
+            Tu es un assistant qui recommande des événements.
+            Voici les SEULS événements disponibles :
 
-Voici des événements disponibles :
+            {context}
 
-{context}
+            Question utilisateur : {question}
 
-Question utilisateur : {question}
-
-Réponds en recommandant les événements pertinents.
-Mentionne le titre, la date et le lieu si possible.
-"""
+            IMPORTANT : Réponds UNIQUEMENT en utilisant les événements listés ci-dessus.
+            Ne mentionne aucun événement qui n'est pas dans la liste.
+            Mentionne le titre, la date et le lieu si possible.
+            """
 
     try:
         response = llm.invoke(prompt)
@@ -82,9 +82,10 @@ Mentionne le titre, la date et le lieu si possible.
 
     return {
         "answer": response.content,
-        "sources": [doc.metadata for doc in docs],
+        "sources": [
+            {**doc.metadata, "page_content": doc.page_content}  # ✅ ajoute le contenu
+            for doc in docs
+        ],
         "prompt": prompt
     }
-    
-    
     
