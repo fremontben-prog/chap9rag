@@ -1,11 +1,25 @@
-from ragas import evaluate
-from ragas.metrics import faithfulness, answer_relevancy, context_recall
+import os
+import pandas as pd
 from datasets import Dataset
+import asyncio
+import nest_asyncio
+import traceback
+from typing import List, Dict
 import requests
+from langchain_mistralai.chat_models import ChatMistralAI
+from langchain_mistralai.embeddings import MistralAIEmbeddings
+from ragas import evaluate
+from ragas.metrics import (
+    faithfulness,
+    answer_relevancy,
+    context_precision,
+    context_recall,
+)
+
+nest_asyncio.apply()
 
 BASE_URL = "http://localhost:8000"
 
-# Jeu de données de test avec réponses humaines annotées
 test_data = [
     {
         "question": "Quels événements ont lieu à Paris ce week-end ?",
@@ -26,40 +40,90 @@ def call_api(question):
     data = response.json()
     return data["answer"], [s.get("description", "") for s in data["sources"]]
 
-#
-def build_dataset():
-    questions, answers, contexts, ground_truths = [], [], [], []
+# Construction du dataset
+print("=== Évaluation RAG avec Ragas ===\n")
+questions_test, answers, placeholder_contexts, ground_truths = [], [], [], []
 
-    for item in test_data:
-        print(f"📨 Question : {item['question']}")
-        answer, context = call_api(item["question"])
-        questions.append(item["question"])
-        answers.append(answer)
-        contexts.append(context)
-        ground_truths.append(item["ground_truth"])
+for item in test_data:
+    print(f"📨 Question : {item['question']}")
+    answer, context = call_api(item["question"])
+    questions_test.append(item["question"])
+    answers.append(answer)
+    placeholder_contexts.append(context)
+    ground_truths.append(item["ground_truth"])
 
-    return Dataset.from_dict({
-        "question": questions,
-        "answer": answers,
-        "contexts": contexts,
-        "ground_truth": ground_truths
-    })
+evaluation_data = {
+    "question": questions_test,
+    "answer": answers,
+    "contexts": placeholder_contexts,
+    "ground_truth": ground_truths
+}
+evaluation_dataset = Dataset.from_dict(evaluation_data)
+print("Dataset d'évaluation prêt.")
 
+# --- Configuration et Exécution de l'Évaluation
+MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY", "VOTRE_CLE_API_MISTRAL_ICI")
+if MISTRAL_API_KEY == "VOTRE_CLE_API_MISTRAL_ICI" or not MISTRAL_API_KEY:
+    print("⚠️ AVERTISSEMENT : Clé API Mistral non trouvée ou non définie.")
 
-if __name__ == "__main__":
-    print("=== Évaluation RAG avec Ragas ===\n")
+try:
+    # 1. Initialisation du LLM et des Embeddings (via Langchain)
+    print("Initialisation LLM et Embeddings Mistral...")
+    mistral_llm = ChatMistralAI(mistral_api_key=MISTRAL_API_KEY, model="mistral-large-latest", temperature=0.1)
+    mistral_embeddings = MistralAIEmbeddings(mistral_api_key=MISTRAL_API_KEY)
+    print("LLM et Embeddings initialisés.")
 
-    dataset = build_dataset()
+    # 2. Définition des métriques à calculer
+    metrics_to_evaluate = [
+        faithfulness,       # Génération: fidèle au contexte ?
+        answer_relevancy,   # Génération: réponse pertinente à la question ?
+        context_precision,  # Récupération: contexte précis (peu de bruit) ?
+        context_recall,     # Récupération: infos clés récupérées (nécessite ground_truth) ?
+    ]
+    print(f"Métriques sélectionnées: {[m.name for m in metrics_to_evaluate]}")
 
+    # 3. Lancement de l'évaluation Ragas
+    print("\nLancement de l'évaluation Ragas (peut prendre du temps)...")
     results = evaluate(
-        dataset,
-        metrics=[faithfulness, answer_relevancy, context_recall]
+        dataset=evaluation_dataset,
+        metrics=metrics_to_evaluate,
+        llm=mistral_llm,
+        embeddings=mistral_embeddings
     )
+    print("\n--- Évaluation Ragas terminée ---")
 
-    print("\n=== Résultats ===")
-    print(results)
+    # 4. Affichage des résultats sous forme de DataFrame
+    print("\n--- Résultats de l'évaluation (DataFrame) ---")
+    results_df = results.to_pandas()
+    pd.set_option('display.max_rows', None)
+    pd.set_option('display.max_columns', None)
+    pd.set_option('display.width', 1000)
+    pd.set_option('display.max_colwidth', 150)
+    print(results_df)
 
-    # Seuils minimaux pour la CI
-    assert results["faithfulness"] >= 0.7, "❌ Fidélité trop faible"
-    assert results["answer_relevancy"] >= 0.7, "❌ Pertinence trop faible"
-    print("\n✅ Évaluation passée avec succès")
+    # 5. Calcul et affichage des scores moyens
+    print("\n--- Scores Moyens (sur tout le dataset) ---")
+    average_scores = results_df.mean(numeric_only=True)
+    print(average_scores)
+
+    # 6. Vérification des seuils pour la CI
+    print("\n--- Vérification des seuils CI ---")
+    if average_scores.get("faithfulness", 0) < 0.7:
+        raise AssertionError("❌ Fidélité trop faible")
+    if average_scores.get("answer_relevancy", 0) < 0.7:
+        raise AssertionError("❌ Pertinence trop faible")
+    if average_scores.get("context_precision", 0) < 0.7:
+        raise AssertionError("❌ Précision du contexte trop faible")
+    if average_scores.get("context_recall", 0) < 0.7:
+        raise AssertionError("❌ Rappel du contexte trop faible")
+    print("✅ Tous les seuils sont respectés")
+
+except AssertionError as e:
+    print(f"\n{e}")
+    raise  # Fait échouer la CI
+
+except Exception as e:
+    print(f"\n❌ ERREUR lors de l'initialisation ou de l'évaluation Ragas : {e}")
+    print("\nTraceback:")
+    traceback.print_exc()
+    raise  # Fait échouer la CI
