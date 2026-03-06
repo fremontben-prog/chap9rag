@@ -6,6 +6,8 @@ BASE_URL = "http://localhost:8000"
 def test_question_normale():
     print("🧪 Test 1 : Question normale")
     response = requests.post(f"{BASE_URL}/chat", json={"question": "Quels événements à Paris ce week-end ?"})
+    print(f"{BASE_URL}/chat")
+    print(f"Réponse : {response.text}")
     assert response.status_code == 200
     data = response.json()
     assert "answer" in data
