@@ -45,6 +45,8 @@ jobs:
 
       - name: Tests fonctionnels
         shell: bash -el {0}
+        env:
+            MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }} 
         run: python test/api_tests.py
 
       - name: Évaluation qualité RAG
