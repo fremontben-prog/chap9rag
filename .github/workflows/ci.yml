@@ -30,12 +30,18 @@ jobs:
           auto-activate-base: false
 
       - name: Démarrage de l'API
-        shell: bash -el {0}  # obligatoire pour activer conda
+        shell: bash -el {0}
         env:
-          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
-        run: |
-          uvicorn api.main:app --host 0.0.0.0 --port 8000 &
-          sleep 5
+            MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+            INDEX_PATH: ${{ github.workspace }}
+        run: 
+            uvicorn api.main:app --host 0.0.0.0 --port 8000 &
+            echo "Attente du démarrage de l'API..."
+            for i in {1..30}; do
+                curl -s http://localhost:8000/docs && break
+                echo "Tentative $i/30..."
+                sleep 2
+            done
 
       - name: Tests fonctionnels
         shell: bash -el {0}
@@ -44,6 +50,6 @@ jobs:
       - name: Évaluation qualité RAG
         shell: bash -el {0}
         env:
-          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+            MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+            OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: python evaluate_rag.py
