@@ -4,7 +4,8 @@ from langchain_mistralai import MistralAIEmbeddings
 from dotenv import load_dotenv
 from pathlib import Path
 
-load_dotenv()
+load_dotenv(override=False) # override=False pour ne pas écraser les vari
+
 index_path = Path(os.environ["INDEX_PATH"])
 index_path = index_path / "mistral_index"
 
