@@ -14,6 +14,7 @@ dependencies:
       - langchain-text-splitters
       - sentence-transformers
       - mistralai==0.4.2         # pip uniquement, plus dans conda
+      - instructor==0.4.8 
       - python-dotenv
       - ragas
       - datasets
