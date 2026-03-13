@@ -13,9 +13,8 @@ dependencies:
       - langchain-mistralai
       - langchain-text-splitters
       - sentence-transformers
-      - mistralai==0.4.2         # pip uniquement, plus dans conda
-      - instructor==0.4.8 
+      - mistralai==1.5.1        # dernière v1 stable, compatible instructor + ragas
       - python-dotenv
-      - ragas
+      - ragas==0.4.3
       - datasets
       - uvicorn

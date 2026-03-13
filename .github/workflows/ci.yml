@@ -33,12 +33,6 @@ jobs:
           cache-env-key: conda-${{ hashFiles('environment.yml') }}
 
 
-      - name: Mise à jour des dépendances pip
-        shell: bash -el {0}
-        run: |
-          conda remove --name chap9rag --force mistralai || true
-          pip install --force-reinstall --no-cache-dir "mistralai>=2.0.0" "instructor>=1.3.0"
-
       - name: Démarrage de l'API
         shell: bash -el {0}
         env:
