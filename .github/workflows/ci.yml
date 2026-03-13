@@ -34,7 +34,9 @@ jobs:
 
       - name: Mise à jour des dépendances pip
         shell: bash -el {0}
-        run: pip install --upgrade "mistralai>=1.0.0" "instructor>=1.3.0"
+        run: |
+          pip uninstall -y mistralai instructor
+          pip install --no-cache-dir "mistralai>=1.0.0" "instructor>=1.3.0"
 
       - name: Démarrage de l'API
         shell: bash -el {0}
