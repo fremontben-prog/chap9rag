@@ -40,7 +40,8 @@ class QuestionRequest(BaseModel):
 class ChatResponse(BaseModel):
     question: str
     answer: str
-    sources: list[str] = []
+    sources: list[dict] = []
+
     
     
 @app.get("/health")
