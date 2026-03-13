@@ -6,9 +6,7 @@ from rag.retriever import load_vectorstore
 
 vectorstore = load_vectorstore()
 
-retriever = vectorstore.as_retriever(
-    search_kwargs={"k": 10}
-)
+# Supprimer la ligne : retriever = vectorstore.as_retriever(search_kwargs={"k": 10})
 
 llm = ChatMistralAI(
     model="mistral-small",
@@ -17,35 +15,25 @@ llm = ChatMistralAI(
 
 
 def filter_results(docs, start_date=None, end_date=None):
-
     filtered = []
-
     for doc in docs:
-
         meta = doc.metadata
-
-
         if start_date and end_date:
-
             date_str = meta.get("date_begin")
-
             if not date_str:
                 continue
-
             event_date = datetime.fromisoformat(date_str)
-
             if not (start_date <= event_date <= end_date):
                 continue
-
         filtered.append(doc)
-
     return filtered
 
 
-def ask_chatbot(question, start_date=None, end_date=None):
-
+def ask_chatbot(question, start_date=None, end_date=None, top_k=10):
     if not question or not question.strip():
         raise ValueError("La question est vide.")
+
+    retriever = vectorstore.as_retriever(search_kwargs={"k": top_k})  # à la volée
 
     try:
         docs = retriever.invoke(question)
@@ -83,9 +71,8 @@ def ask_chatbot(question, start_date=None, end_date=None):
     return {
         "answer": response.content,
         "sources": [
-            {**doc.metadata, "page_content": doc.page_content}  # ✅ ajoute le contenu
+            {**doc.metadata, "page_content": doc.page_content}
             for doc in docs
         ],
         "prompt": prompt
     }
-    
