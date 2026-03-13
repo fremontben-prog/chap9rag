@@ -28,6 +28,13 @@ jobs:
           environment-file: environment.yml
           python-version: "3.10"
           auto-activate-base: false
+          use-mamba: true          # plus rapide
+          cache-env: true
+          cache-env-key: conda-${{ hashFiles('environment.yml') }}
+
+      - name: Mise à jour des dépendances pip
+        shell: bash -el {0}
+        run: pip install --upgrade "mistralai>=1.0.0" "instructor>=1.3.0"
 
       - name: Démarrage de l'API
         shell: bash -el {0}
