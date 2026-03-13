@@ -24,7 +24,7 @@ BASE_URL = "http://localhost:8000"
 test_data = [
     {
         "question": "Y a-t-il des événements liés à l'industrie ?",
-        "ground_truth": "Il existe des ateliers de découverte des métiers de l'industrie dans plusieurs villes françaises."
+        "ground_truth": "Il existe un atelier de découverte du secteur de l'industrie." 
     },
     {
         "question": "Quels événements ont lieu à Caen ?",
