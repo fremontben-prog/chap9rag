@@ -40,6 +40,8 @@ jobs:
           pip show mistralai
           pip show ragas | grep -i requires
           conda list mistralai
+          ls /usr/share/miniconda/envs/chap9rag/lib/python3.10/site-packages/mistralai/
+          cat /usr/share/miniconda/envs/chap9rag/lib/python3.10/site-packages/mistralai/__init__.py
 
       - name: Mise à jour des dépendances pip
         shell: bash -el {0}
