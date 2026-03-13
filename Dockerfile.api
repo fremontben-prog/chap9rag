@@ -6,7 +6,9 @@ COPY api/requirements_api.txt .
 RUN pip install --no-cache-dir -r requirements_api.txt
 
 COPY api/ ./api/
-COPY mistral_index/ ./mistral_index/
+COPY rag/ ./rag/
+COPY vectorstore/ ./vectorstore/
+COPY scripts/ ./scripts/
 
 
 

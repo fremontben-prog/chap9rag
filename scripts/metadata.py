@@ -30,6 +30,7 @@ def build_content(row):
         {row.get('conditions_fr', '')}
 """
 
+# Creation du text splitter pour LangChain
 def create_text_splitter():
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=800,
