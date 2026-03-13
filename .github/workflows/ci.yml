@@ -32,7 +32,6 @@ jobs:
           cache-env: true
           cache-env-key: conda-${{ hashFiles('environment.yml') }}
 
-
       - name: Démarrage de l'API
         shell: bash -el {0}
         env:
