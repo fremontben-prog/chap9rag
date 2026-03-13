@@ -13,7 +13,8 @@ dependencies:
       - langchain-mistralai
       - langchain-text-splitters
       - sentence-transformers
-      - mistralai
+      - mistralai>=1.0.0
+      - instructor>=1.3.0
       - python-dotenv
       - ragas
       - datasets
