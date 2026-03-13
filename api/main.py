@@ -23,6 +23,7 @@ app = FastAPI(
     
 class QuestionRequest(BaseModel):
     question: str
+    top_k: int = 5  # valeur par défaut cohérente avec top_k_default dans /metadata
 
     @field_validator("question")
     @classmethod
@@ -31,8 +32,7 @@ class QuestionRequest(BaseModel):
             raise ValueError("La question ne peut pas être vide.")
         if len(v.strip()) < 3:
             raise ValueError("La question est trop courte.")
-        return v.strip()
-        if len(v.strip()) > 500:
+        if len(v.strip()) > 500:  # déplacé avant le return
             raise ValueError("La question ne peut pas dépasser 500 caractères.")
         return v.strip()
     
