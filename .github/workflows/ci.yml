@@ -32,6 +32,15 @@ jobs:
           cache-env: true
           cache-env-key: conda-${{ hashFiles('environment.yml') }}
 
+
+      - name: Diagnostic complet
+        shell: bash -el {0}
+        run: |
+          python -c "import mistralai; print(mistralai.__file__)"
+          pip show mistralai
+          pip show ragas | grep -i requires
+          conda list mistralai
+
       - name: Mise à jour des dépendances pip
         shell: bash -el {0}
         run: |
