@@ -38,6 +38,15 @@ jobs:
           pip uninstall -y mistralai instructor
           pip install --no-cache-dir "mistralai>=1.0.0" "instructor>=1.3.0"
 
+      - name: Diagnostic pip
+        shell: bash -el {0}
+        run: |
+          which python
+          which pip
+          pip show mistralai
+          pip show instructor
+          python -c "import mistralai; print(mistralai.__file__)"
+
       - name: Démarrage de l'API
         shell: bash -el {0}
         env:
