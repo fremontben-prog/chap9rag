@@ -23,7 +23,7 @@ app = FastAPI(
     
 class QuestionRequest(BaseModel):
     question: str
-    top_k: int = 5  # valeur par défaut cohérente avec top_k_default dans /metadata
+    top_k: int = 5  #  valeur par défaut cohérente avec top_k_default dans /metadata
 
     @field_validator("question")
     @classmethod
