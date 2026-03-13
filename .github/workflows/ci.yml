@@ -32,13 +32,7 @@ jobs:
           cache-env: true
           cache-env-key: conda-${{ hashFiles('environment.yml') }}
 
-      - name: Capture versions
-        shell: bash -el {0}
-        run: |
-          conda env export > environment_frozen.yml
-          cat environment_frozen.yml
 
-          
       - name: Démarrage de l'API
         shell: bash -el {0}
         env:
