@@ -104,17 +104,17 @@ dependencies:
   - python=3.10
   - faiss-cpu=1.7.4
   - pandas
-  - fastapi
+  - fastapi=0.135.1
   - pip
   - pip:
       - langchain>=0.2.0
       - langchain-community>=0.2.0
       - langchain-mistralai
-      - langchain-text-splitters
-      - sentence-transformers
-      - mistralai
+      - langchain-text-splitters==1.1.1
+      - sentence-transformers==5.3.0
+      - mistralai==1.5.1
       - python-dotenv
-      - ragas
+      - ragas==0.4.3
       - datasets
       - uvicorn
 ```
